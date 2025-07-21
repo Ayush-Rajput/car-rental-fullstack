@@ -447,6 +447,4 @@ The enhanced animations and Indian localization make it particularly suitable fo
 
 ---
 
-*Documentation Version: 1.0*  
-*Last Updated: January 2025*  
-*Project Status: Active Development*
+
