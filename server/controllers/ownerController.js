@@ -2,7 +2,6 @@ import imagekit from "../configs/imageKit.js";
 import Booking from "../models/Booking.js";
 import Car from "../models/Car.js";
 import User from "../models/User.js";
-import fs from "fs";
 
 
 // API to Change Role of User
@@ -25,8 +24,8 @@ export const addCar = async (req, res)=>{
         let car = JSON.parse(req.body.carData);
         const imageFile = req.file;
 
-        // Upload Image to ImageKit
-        const fileBuffer = fs.readFileSync(imageFile.path)
+        // Upload Image to ImageKit from memory buffer
+        const fileBuffer = imageFile.buffer
         const response = await imagekit.upload({
             file: fileBuffer,
             fileName: imageFile.originalname,
@@ -155,8 +154,8 @@ export const updateUserImage = async (req, res)=>{
 
         const imageFile = req.file;
 
-        // Upload Image to ImageKit
-        const fileBuffer = fs.readFileSync(imageFile.path)
+        // Upload Image to ImageKit from memory buffer
+        const fileBuffer = imageFile.buffer
         const response = await imagekit.upload({
             file: fileBuffer,
             fileName: imageFile.originalname,

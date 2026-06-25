@@ -2,30 +2,15 @@ import React, { useState } from 'react'
 import { assets, menuLinks } from '../assets/assets'
 import {Link, useLocation, useNavigate} from 'react-router-dom'
 import { useAppContext } from '../context/AppContext'
-import toast from 'react-hot-toast'
 import {motion} from 'motion/react'
 
 const Navbar = () => {
 
-    const {setShowLogin, user, logout, isOwner, axios, setIsOwner} = useAppContext()
+    const {setShowLogin, user, logout, isOwner, changeRole} = useAppContext()
 
     const location = useLocation()
     const [open, setOpen] = useState(false)
     const navigate = useNavigate()
-
-    const changeRole = async ()=>{
-        try {
-            const { data } = await axios.post('/api/owner/change-role')
-            if (data.success) {
-                setIsOwner(true)
-                toast.success(data.message)
-            }else{
-                toast.error(data.message)
-            }
-        } catch (error) {
-            toast.error(error.message)
-        }
-    }
 
   return (
     <motion.div 
@@ -52,7 +37,7 @@ const Navbar = () => {
 
             <div className='flex max-sm:flex-col items-start sm:items-center gap-6'>
 
-                <button onClick={()=> isOwner ? navigate('/owner') : changeRole()} className="cursor-pointer">{isOwner ? 'Dashboard' : 'List cars'}</button>
+                <button onClick={()=> isOwner ? navigate('/owner') : (user ? changeRole() : setShowLogin(true))} className="cursor-pointer">{isOwner ? 'Dashboard' : 'List cars'}</button>
 
                 <button onClick={()=> {user ? logout() : setShowLogin(true)}} className="cursor-pointer px-8 py-2 bg-primary hover:bg-primary-dull transition-all text-white rounded-lg">{user ? 'Logout' : 'Login'}</button>
             </div>

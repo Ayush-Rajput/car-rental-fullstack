@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useCallback } from 'react'
 import Title from '../components/Title'
-import { assets, dummyCarData } from '../assets/assets'
+import { assets } from '../assets/assets'
 import CarCard from '../components/CarCard'
 import { useSearchParams } from 'react-router-dom'
 import { useAppContext } from '../context/AppContext'
@@ -22,7 +22,7 @@ const Cars = () => {
   const isSearchData = pickupLocation && pickupDate && returnDate
   const [filteredCars, setFilteredCars] = useState([])
 
-  const applyFilter = async ()=>{
+  const applyFilter = useCallback(async ()=>{
      
     if(input === ''){
       setFilteredCars(cars)
@@ -36,9 +36,9 @@ const Cars = () => {
       || car.transmission.toLowerCase().includes(input.toLowerCase())
     })
     setFilteredCars(filtered)
-  }
+  }, [input, cars])
 
-  const searchCarAvailablity = async () =>{
+  const searchCarAvailablity = useCallback(async () =>{
     const {data} = await axios.post('/api/bookings/check-availability', {location: pickupLocation, pickupDate, returnDate})
     if (data.success) {
       setFilteredCars(data.availableCars)
@@ -47,15 +47,19 @@ const Cars = () => {
       }
       return null
     }
-  }
+  }, [axios, pickupLocation, pickupDate, returnDate])
 
   useEffect(()=>{
-    isSearchData && searchCarAvailablity()
-  },[])
+    if (isSearchData) {
+      searchCarAvailablity()
+    }
+  },[isSearchData, searchCarAvailablity])
 
   useEffect(()=>{
-    cars.length > 0 && !isSearchData && applyFilter()
-  },[input, cars])
+    if (cars.length > 0 && !isSearchData) {
+      applyFilter()
+    }
+  },[cars, isSearchData, applyFilter])
 
   return (
     <div>

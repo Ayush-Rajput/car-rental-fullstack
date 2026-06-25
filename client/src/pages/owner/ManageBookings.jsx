@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useCallback } from 'react'
 import Title from '../../components/owner/Title'
 import { useAppContext } from '../../context/AppContext'
 import toast from 'react-hot-toast'
@@ -9,14 +9,14 @@ const ManageBookings = () => {
 
   const [bookings, setBookings] = useState([])
 
-  const fetchOwnerBookings = async ()=>{
+  const fetchOwnerBookings = useCallback(async ()=>{
     try {
       const { data } = await axios.get('/api/bookings/owner')
       data.success ? setBookings(data.bookings) : toast.error(data.message)
     } catch (error) {
       toast.error(error.message)
     }
-  }
+  }, [axios])
 
   const changeBookingStatus = async (bookingId, status)=>{
     try {
@@ -35,7 +35,7 @@ const ManageBookings = () => {
 
   useEffect(()=>{
     fetchOwnerBookings()
-  },[])
+  },[fetchOwnerBookings])
 
   return (
     <div className='px-4 pt-10 md:px-10 w-full'>

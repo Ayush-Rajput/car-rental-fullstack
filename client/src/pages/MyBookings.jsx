@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useCallback } from 'react'
 import { assets} from '../assets/assets'
 import Title from '../components/Title'
 import { useAppContext } from '../context/AppContext'
@@ -11,7 +11,7 @@ const MyBookings = () => {
 
   const [bookings, setBookings] = useState([])
 
-  const fetchMyBookings = async ()=>{
+  const fetchMyBookings = useCallback(async ()=>{
     try {
       const { data } = await axios.get('/api/bookings/user')
       if (data.success){
@@ -22,11 +22,13 @@ const MyBookings = () => {
     } catch (error) {
       toast.error(error.message)
     }
-  }
+  }, [axios])
 
   useEffect(()=>{
-    user && fetchMyBookings()
-  },[user])
+    if (user) {
+      fetchMyBookings()
+    }
+  },[user, fetchMyBookings])
 
   return (
     <motion.div 

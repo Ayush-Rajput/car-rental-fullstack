@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react'
-import { assets, dummyDashboardData } from '../../assets/assets'
+import React, { useEffect, useState, useCallback } from 'react'
+import { assets } from '../../assets/assets'
 import Title from '../../components/owner/Title'
 import { useAppContext } from '../../context/AppContext'
 import toast from 'react-hot-toast'
@@ -24,7 +24,7 @@ const Dashboard = () => {
     {title: "Confirmed", value: data.completedBookings, icon: assets.listIconColored},
   ]
 
-  const fetchDashboardData = async ()=>{
+  const fetchDashboardData = useCallback(async ()=>{
     try {
        const { data } = await axios.get('/api/owner/dashboard')
        if (data.success){
@@ -35,13 +35,13 @@ const Dashboard = () => {
     } catch (error) {
       toast.error(error.message)
     }
-  }
+  }, [axios])
 
   useEffect(()=>{
     if(isOwner){
       fetchDashboardData()
     }
-  },[isOwner])
+  },[isOwner, fetchDashboardData])
 
   return (
     <div className='px-4 pt-10 md:px-10 flex-1'>

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { assets, dummyCarData } from '../assets/assets'
+import { assets } from '../assets/assets'
 import Loader from '../components/Loader'
 import { useAppContext } from '../context/AppContext'
 import toast from 'react-hot-toast'
@@ -18,6 +18,10 @@ const CarDetails = () => {
 
   const handleSubmit = async (e)=>{
     e.preventDefault();
+    if (new Date(returnDate) <= new Date(pickupDate)) {
+      toast.error('Return date must be after pickup date')
+      return
+    }
     try {
       const {data} = await axios.post('/api/bookings/create', {
         car: id,

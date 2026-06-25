@@ -6,6 +6,7 @@ import Car from "../models/Car.js";
 const checkAvailability = async (car, pickupDate, returnDate)=>{
     const bookings = await Booking.find({
         car,
+        status: { $ne: "cancelled" },
         pickupDate: {$lte: returnDate},
         returnDate: {$gte: pickupDate},
     })
@@ -43,6 +44,12 @@ export const createBooking = async (req, res)=>{
         const {_id} = req.user;
         const {car, pickupDate, returnDate} = req.body;
 
+        const picked = new Date(pickupDate);
+        const returned = new Date(returnDate);
+        if (returned <= picked) {
+            return res.json({success: false, message: "Return date must be after pickup date"})
+        }
+
         const isAvailable = await checkAvailability(car, pickupDate, returnDate)
         if(!isAvailable){
             return res.json({success: false, message: "Car is not available"})
@@ -51,8 +58,6 @@ export const createBooking = async (req, res)=>{
         const carData = await Car.findById(car)
 
         // Calculate price based on pickupDate and returnDate
-        const picked = new Date(pickupDate);
-        const returned = new Date(returnDate);
         const noOfDays = Math.ceil((returned - picked) / (1000 * 60 * 60 * 24))
         const price = carData.pricePerDay * noOfDays;
 
@@ -86,7 +91,7 @@ export const getOwnerBookings = async (req, res)=>{
         if(req.user.role !== 'owner'){
             return res.json({ success: false, message: "Unauthorized" })
         }
-        const bookings = await Booking.find({owner: req.user._id}).populate('car user').select("-user.password").sort({createdAt: -1 })
+        const bookings = await Booking.find({owner: req.user._id}).populate('car').populate('user', '-password').sort({createdAt: -1 })
         res.json({success: true, bookings})
     } catch (error) {
         console.log(error.message);
